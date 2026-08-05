@@ -74,7 +74,7 @@ if st.session_state.ai_consulted:
 
 st.divider()
 st.subheader("✍️ あなたの回答")
-student_answer = st.text_input("最終的な答えを入力してください", placeholder="例: 5円")
+student_answer = st.text_input("最終的な答えを入力してください")
 
 if st.button("回答を確定・提出する", type="primary"):
     elapsed_time = round(time.time() - st.session_state.start_time, 2)
