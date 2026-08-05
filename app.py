@@ -113,3 +113,10 @@ with st.expander("🎓 教員専用アナリティクス"):
     if st.session_state.logs:
         df_logs = pd.DataFrame(st.session_state.logs)
         st.dataframe(df_logs)
+        csv_data = df_logs.to_csv(index=False).encode('utf-8-sig')
+        st.download_button(
+            label="📥 実験データをCSVでダウンロード",
+            data=csv_data,
+            file_name="cognitive_surrender_data.csv",
+            mime="text/csv",
+        )
