@@ -78,9 +78,13 @@ student_answer = st.text_input("最終的な答えを入力してください")
 
 if st.button("回答を確定・提出する", type="primary"):
     elapsed_time = round(time.time() - st.session_state.start_time, 2)
-    cleaned_answer = student_answer.strip().replace(" ", "")
-    is_correct = (cleaned_answer == q_data["correct_answer"])
-    is_surrender = (cleaned_answer == q_data["trap_answer"]) and st.session_state.ai_consulted
+    # 入力文字から数字だけを抽出して比較する処理
+    target_num = "".join(filter(str.isdigit, q_data["correct_answer"]))
+    trap_num = "".join(filter(str.isdigit, q_data["trap_answer"]))
+    user_num = "".join(filter(str.isdigit, student_answer))
+
+    is_correct = (user_num == target_num) if user_num else (student_answer.strip() == q_data["correct_answer"])
+    is_surrender = ((user_num == trap_num) if user_num else (student_answer.strip() == q_data["trap_answer"])) and st.session_state.ai_consulted
     
     log_entry = {
         "Timestamp": pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S"),
