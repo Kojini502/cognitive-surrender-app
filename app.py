@@ -6,7 +6,29 @@ from streamlit_gsheets import GSheetsConnection
 
 st.set_page_config(page_title="思考の検品力テスト", page_icon="🧪", layout="wide")
 st.title("🧪 批判的思考（思考の検品力）測定シミュレーター")
+# --- 事前アンケート・基本情報入力 ---
+st.markdown("---")
+st.subheader("📋 基本情報・事前アンケート")
 
+col_id, col_freq, col_trust = st.columns(3)
+
+with col_id:
+    student_id = st.text_input("学籍番号（Student ID）を入力してください")
+
+with col_freq:
+    ai_frequency = st.selectbox(
+        "普段の生成AI利用頻度",
+        ["ほぼ毎日", "週に数回", "月に数回", "ほとんど使わない", "使ったことがない"]
+    )
+
+with col_trust:
+    ai_trust = st.slider(
+        "AI回答の信頼度（1:低い 〜 5:高い）",
+        min_value=1,
+        max_value=5,
+        value=3,
+        help="1: 全く信用しない 〜 5: 非常に信用する"
+    )
 CRT_DATABASE = {
     "q1": {
         "title": "問1: バットとボール問題",
@@ -109,6 +131,8 @@ if st.button("回答を確定・提出する", type="primary"):
     log_entry = {
         "Timestamp": pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S"),
         "Student_ID": student_id,
+        "AI_Frequency": ai_frequency,
+        "AI_Trust": ai_trust,
         "Group": group_name,
         "Question": q_data["title"],
         "Thinking_Time_Sec": elapsed_time,
