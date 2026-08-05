@@ -63,7 +63,7 @@ st.info(f"**【問題】**\n\n{q_data['question']}")
 st.divider()
 st.subheader("🤖 AIアシスタント")
 
-if st.button("💡 AIに解き方を相談する（トラップ提示）"):
+if st.button("💡 AIに解き方を相談する"):
     st.session_state.ai_consulted = True
 
 if st.session_state.ai_consulted:
