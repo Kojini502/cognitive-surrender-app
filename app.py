@@ -75,7 +75,27 @@ if st.session_state.ai_consulted:
 st.divider()
 st.subheader("✍️ あなたの回答")
 student_answer = st.text_input("最終的な答えを入力してください")
+st.markdown("---")
+st.subheader("📊 回答に関するアンケート")
 
+col1, col2 = st.columns(2)
+with col1:
+    confidence = st.slider(
+        "1. 自分の回答に対する確信度",
+        min_value=1,
+        max_value=5,
+        value=3,
+        help="1: 全く自信がない 〜 5: 非常に自信がある"
+    )
+
+with col2:
+    difficulty = st.slider(
+        "2. この問題の主観的難易度",
+        min_value=1,
+        max_value=5,
+        value=3,
+        help="1: とても簡単 〜 5: とても難しい"
+    )
 if st.button("回答を確定・提出する", type="primary"):
     elapsed_time = round(time.time() - st.session_state.start_time, 2)
     # 入力文字から数字だけを抽出して比較する処理
@@ -95,6 +115,8 @@ if st.button("回答を確定・提出する", type="primary"):
         "AI_Consulted": st.session_state.ai_consulted,
         "Copied_AI_Text": st.session_state.copied,
         "Student_Answer": student_answer,
+        "Confidence": confidence,
+        "Difficulty": difficulty,
         "Cognitive_Surrender": is_surrender,
         "Is_Correct": is_correct
     }
