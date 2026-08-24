@@ -53,27 +53,34 @@ CRT_DATABASE = {
     },
 }
 
+import streamlit as st
+import pandas as pd
+import gspread
+from google.oauth2.service_account import Credentials
+
+import streamlit as st
+import pandas as pd
+import gspread
+from google.oauth2.service_account import Credentials
+
 def save_to_gsheets(log_entry):
     try:
-        # スプレッドシートの完全なURLを指定
-        url = "https://docs.google.com/spreadsheets/d/1ZH1Wfg438uequ9o95MfxwFmJ5Ro7_glFO9t-UlgKq2w/edit"
-        conn = st.connection("gsheets", type=GSheetsConnection)
+        scopes = [
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
         
-        # 既存データを読み込み
-        existing_data = conn.read(spreadsheet=url, ttl=0)
+        # Streamlit Secretsから安全に鍵を取得
+        creds_dict = dict(st.secrets["gcp_service_account"])
+        credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+        gc = gspread.authorize(credentials)
         
-        # 新しい回答データを1行のDataFrameに変換
-        new_row_df = pd.DataFrame([log_entry])
+        # スプレッドシートを開く
+        sheet = gc.open_by_key("1ZH1Wfg438uequ9o95MfxwFmJ5Ro7_glFO9t-UlgKq2w").sheet1
         
-        # 結合
-        if existing_data is not None and not existing_data.empty:
-            # 欠損列を補完して結合
-            updated_df = pd.concat([existing_data, new_row_df], ignore_index=True)
-        else:
-            updated_df = new_row_df
-            
-        # スプレッドシートを更新
-        conn.update(spreadsheet=url, data=updated_df)
+        # 1行追加
+        row_values = list(log_entry.values())
+        sheet.append_row(row_values)
         return True
     except Exception as e:
         st.error(f"スプレッドシート保存エラー: {e}")
