@@ -56,7 +56,7 @@ CRT_DATABASE = {
 def save_to_gsheets(log_entry):
     try:
         # デプロイ画面で発行されたURL（末尾が /exec になっていることを確認）
-        gas_url = "https://script.google.com/macros/s/AKfycbuwH2PXebIx3ThnHEubktBTlDYLR005al8xzgtFWso55G03qsVMs99Gn2DuopYt2pewhXQ/exec"
+        gas_url = "https://script.google.com/macros/s/AKfycbwH2PXeblx3ThnHEubktBTIDYLr005aI8xzgIFWso55G03qsVMs99Gn2DuopYt2pewhXQ/exec"
         
         payload = {
             "row_values": list(log_entry.values())
