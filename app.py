@@ -58,11 +58,6 @@ import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
 
-import streamlit as st
-import pandas as pd
-import gspread
-from google.oauth2.service_account import Credentials
-
 def save_to_gsheets(log_entry):
     try:
         scopes = [
@@ -70,7 +65,7 @@ def save_to_gsheets(log_entry):
             "https://www.googleapis.com/auth/drive"
         ]
         
-        # Streamlit Secretsから安全に鍵を取得
+        # Secretsから安全に認証情報を読み出し
         creds_dict = dict(st.secrets["gcp_service_account"])
         credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         gc = gspread.authorize(credentials)
