@@ -53,15 +53,26 @@ CRT_DATABASE = {
     },
 }
 
-def save_to_gsheets(log_data):
+def save_to_gsheets(log_entry):
     try:
         conn = st.connection("gsheets", type=GSheetsConnection)
+        
+        # 既存データを読み込み
         existing_data = conn.read(ttl=0)
-        new_df = pd.DataFrame([log_data])
-        updated_df = new_df if existing_data.empty else pd.concat([existing_data, new_df], ignore_index=True)
+        
+        # 新しい回答データを1行の表に変換
+        new_row_df = pd.DataFrame([log_entry])
+        
+        # 結合して更新
+        if existing_data is not None and not existing_data.empty:
+            updated_df = pd.concat([existing_data, new_row_df], ignore_index=True)
+        else:
+            updated_df = new_row_df
+            
         conn.update(data=updated_df)
         return True
-    except Exception:
+    except Exception as e:
+        st.error(f"スプレッドシート保存エラー: {e}")
         return False
 
 if "logs" not in st.session_state:
