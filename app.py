@@ -62,8 +62,12 @@ def save_to_gsheets(log_entry):
             "https://www.googleapis.com/auth/drive"
         ]
         
-        # Base64から完全に元のJSONを安全復元
-        b64_str = st.secrets["gcp_service_account_b64"]
+        # Base64文字列を取得し、パディングを安全に自動補正
+        b64_str = st.secrets["gcp_service_account_b64"].strip()
+        missing_padding = len(b64_str) % 4
+        if missing_padding:
+            b64_str += '=' * (4 - missing_padding)
+            
         json_str = base64.b64decode(b64_str).decode("utf-8")
         creds_dict = json.loads(json_str)
         
@@ -77,6 +81,9 @@ def save_to_gsheets(log_entry):
         row_values = list(log_entry.values())
         sheet.append_row(row_values)
         return True
+    except Exception as e:
+        st.error(f"スプレッドシート保存エラー: {e}")
+        return False
     except Exception as e:
         st.error(f"スプレッドシート保存エラー: {e}")
         return False
