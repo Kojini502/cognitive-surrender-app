@@ -2,7 +2,8 @@ import time
 import json
 import pandas as pd
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
+import gspread
+from google.oauth2.service_account import Credentials
 
 st.set_page_config(page_title="思考の検品力テスト", page_icon="🧪", layout="wide")
 st.title("🧪 批判的思考（思考の検品力）測定シミュレーター")
@@ -52,11 +53,6 @@ CRT_DATABASE = {
         "ai_explanation": "機械の数と製品の数が同じ割合で増加しています。5台で5個＝5分ですので、100台で100個の場合は比例して100分かかる計算になります。",
     },
 }
-
-import streamlit as st
-import pandas as pd
-import gspread
-from google.oauth2.service_account import Credentials
 
 def save_to_gsheets(log_entry):
     try:
