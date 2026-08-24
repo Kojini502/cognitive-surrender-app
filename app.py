@@ -55,21 +55,24 @@ CRT_DATABASE = {
 
 def save_to_gsheets(log_entry):
     try:
-        # デプロイ画面でコピーしたURLをそのまま貼り付け
+        # デプロイ画面で発行されたURL（末尾が /exec になっていることを確認）
         gas_url = "https://script.google.com/macros/s/AKfycbuwH2PXebIx3ThnHEubktBTlDYLR005al8xzgtFWso55G03qsVMs99Gn2DuopYt2pewhXQ/exec"
         
         payload = {
             "row_values": list(log_entry.values())
         }
         
+        # allow_redirects=True を指定してリダイレクトを自動追従させる
         response = requests.post(
             gas_url,
             data=json.dumps(payload),
             headers={"Content-Type": "application/json"},
-            timeout=10
+            allow_redirects=True,
+            timeout=15
         )
         
-        if response.status_code == 200:
+        # 200〜399番台のレスポンスであれば成功と判定
+        if response.status_code in [200, 302]:
             return True
         else:
             st.error(f"保存エラー（ステータスコード: {response.status_code}）")
