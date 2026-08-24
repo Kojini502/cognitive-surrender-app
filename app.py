@@ -61,9 +61,11 @@ def save_to_gsheets(log_entry):
             "https://www.googleapis.com/auth/drive"
         ]
         
-        # Secretsに保存したJSON文字列を直接辞書オブジェクトにパース
-        raw_json = st.secrets["gcp_service_account_json"]
-        creds_dict = json.loads(raw_json)
+        # Secretsから辞書をそのまま取得
+        creds_dict = dict(st.secrets["gcp_service_account"])
+        
+        # 文字列として入っている \n を改行コードに変換
+        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
         
         credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         gc = gspread.authorize(credentials)
