@@ -151,7 +151,6 @@ if st.button("回答を確定・提出する", type="primary"):
         "Student_ID": student_id,
         "AI_Frequency": ai_frequency,
         "AI_Trust": ai_trust,
-        "Group": group_name,
         "Question": q_data["title"],
         "Thinking_Time_Sec": elapsed_time,
         "AI_Consulted": st.session_state.ai_consulted,
