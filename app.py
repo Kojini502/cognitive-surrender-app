@@ -1,3 +1,4 @@
+import re
 import time
 import pandas as pd
 import streamlit as st
@@ -60,8 +61,14 @@ def save_to_gsheets(log_entry):
             "https://www.googleapis.com/auth/drive"
         ]
         
-        # 3重クォートで保持された辞書をそのまま認証に渡す
         creds_dict = dict(st.secrets["gcp_service_account"])
+        
+        # 鍵の本体英数字だけを取り出し、64文字ごとに正規の改行を入れ直して整形
+        raw_key = creds_dict["private_key"]
+        body = re.sub(r"-----[^-]+-----|\s+", "", raw_key)
+        formatted_body = "\n".join([body[i:i+64] for i in range(0, len(body), 64)])
+        creds_dict["private_key"] = f"-----BEGIN PRIVATE KEY-----\n{formatted_body}\n-----END PRIVATE KEY-----\n"
+        
         credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         gc = gspread.authorize(credentials)
         
