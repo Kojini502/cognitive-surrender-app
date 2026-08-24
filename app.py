@@ -53,6 +53,7 @@ CRT_DATABASE = {
     },
 }
 
+import json
 import streamlit as st
 import pandas as pd
 import gspread
@@ -65,9 +66,8 @@ def save_to_gsheets(log_entry):
             "https://www.googleapis.com/auth/drive"
         ]
         
-        # Secretsから安全に認証情報を読み出し
-        creds_dict = dict(st.secrets["gcp_service_account"])
-        
+        # JSON文字列を直接辞書オブジェクトに復元
+        creds_dict = json.loads(st.secrets["gcp_service_account"])
         credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         gc = gspread.authorize(credentials)
         
