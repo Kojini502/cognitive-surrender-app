@@ -1,4 +1,4 @@
-import re
+import json
 import time
 import pandas as pd
 import streamlit as st
@@ -60,28 +60,21 @@ def save_to_gsheets(log_entry):
             "https://www.googleapis.com/auth/spreadsheets",
             "https://www.googleapis.com/auth/drive"
         ]
-
-        creds_dict = dict(st.secrets["gcp_service_account"])
-
-        # Streamlit Secretsで \n が文字列化されている場合だけ実改行へ戻す
-        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
-
-        credentials = Credentials.from_service_account_info(
-            creds_dict,
-            scopes=scopes
-        )
-
+        
+        # Secretsに保存したJSON文字列を直接辞書オブジェクトにパース
+        raw_json = st.secrets["gcp_service_account_json"]
+        creds_dict = json.loads(raw_json)
+        
+        credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         gc = gspread.authorize(credentials)
-
-        sheet = gc.open_by_key(
-            "1ZH1Wfg438uequ9o95MfxwFmJ5Ro7_glFO9t-UlgKq2w"
-        ).sheet1
-
+        
+        # スプレッドシートを開く
+        sheet = gc.open_by_key("1ZH1Wfg438uequ9o95MfxwFmJ5Ro7_glFO9t-UlgKq2w").sheet1
+        
+        # 1行追加
         row_values = list(log_entry.values())
         sheet.append_row(row_values)
-
         return True
-
     except Exception as e:
         st.error(f"スプレッドシート保存エラー: {e}")
         return False
