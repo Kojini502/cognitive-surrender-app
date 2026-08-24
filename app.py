@@ -56,29 +56,27 @@ CRT_DATABASE = {
 
 def save_to_gsheets(log_entry):
     try:
-        scopes = [
-            "https://www.googleapis.com/auth/spreadsheets",
-            "https://www.googleapis.com/auth/drive"
-        ]
+        # デプロイ画面でコピーしたURLをそのまま貼り付け
+        gas_url = "https://script.google.com/macros/s/AKfycbuwH2PXebIx3ThnHEubktBTlDYLR005al8xzgtFWso55G03qsVMs99Gn2DuopYt2pewhXQ/exec"
         
-        # Secretsから辞書をそのまま取得
-        creds_dict = dict(st.secrets["gcp_service_account"])
+        payload = {
+            "row_values": list(log_entry.values())
+        }
         
-        # 文字列として入っている \n を改行コードに変換
-        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+        response = requests.post(
+            gas_url,
+            data=json.dumps(payload),
+            headers={"Content-Type": "application/json"},
+            timeout=10
+        )
         
-        credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
-        gc = gspread.authorize(credentials)
-        
-        # スプレッドシートを開く
-        sheet = gc.open_by_key("1ZH1Wfg438uequ9o95MfxwFmJ5Ro7_glFO9t-UlgKq2w").sheet1
-        
-        # 1行追加
-        row_values = list(log_entry.values())
-        sheet.append_row(row_values)
-        return True
+        if response.status_code == 200:
+            return True
+        else:
+            st.error(f"保存エラー（ステータスコード: {response.status_code}）")
+            return False
     except Exception as e:
-        st.error(f"スプレッドシート保存エラー: {e}")
+        st.error(f"保存通信エラー: {e}")
         return False
     
 if "logs" not in st.session_state:
