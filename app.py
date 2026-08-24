@@ -89,10 +89,6 @@ def save_to_gsheets(log_entry):
 if "logs" not in st.session_state:
     st.session_state.logs = []
 
-st.sidebar.header("👤 参加者設定")
-student_id = st.sidebar.text_input("学籍番号またはID", value="Student_01")
-group_name = st.sidebar.text_input("グループ/クラス名", value="生理学講義")
-
 q_key = st.selectbox("取り組む問題を選択してください", options=list(CRT_DATABASE.keys()), format_func=lambda x: CRT_DATABASE[x]["title"])
 q_data = CRT_DATABASE[q_key]
 
