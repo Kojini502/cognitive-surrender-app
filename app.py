@@ -55,21 +55,25 @@ CRT_DATABASE = {
 
 def save_to_gsheets(log_entry):
     try:
+        # スプレッドシートの完全なURLを指定
+        url = "https://docs.google.com/spreadsheets/d/1ZH1Wfg438uequ9o95MfxwFmJ5Ro7_glFO9t-UlgKq2w/edit"
         conn = st.connection("gsheets", type=GSheetsConnection)
         
         # 既存データを読み込み
-        existing_data = conn.read(ttl=0)
+        existing_data = conn.read(spreadsheet=url, ttl=0)
         
-        # 新しい回答データを1行の表に変換
+        # 新しい回答データを1行のDataFrameに変換
         new_row_df = pd.DataFrame([log_entry])
         
-        # 結合して更新
+        # 結合
         if existing_data is not None and not existing_data.empty:
+            # 欠損列を補完して結合
             updated_df = pd.concat([existing_data, new_row_df], ignore_index=True)
         else:
             updated_df = new_row_df
             
-        conn.update(data=updated_df)
+        # スプレッドシートを更新
+        conn.update(spreadsheet=url, data=updated_df)
         return True
     except Exception as e:
         st.error(f"スプレッドシート保存エラー: {e}")
