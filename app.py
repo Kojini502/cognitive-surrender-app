@@ -60,25 +60,28 @@ def save_to_gsheets(log_entry):
             "https://www.googleapis.com/auth/spreadsheets",
             "https://www.googleapis.com/auth/drive"
         ]
-        
+
         creds_dict = dict(st.secrets["gcp_service_account"])
-        
-        # 鍵の本体英数字だけを取り出し、64文字ごとに正規の改行を入れ直して整形
-        raw_key = creds_dict["private_key"]
-        body = re.sub(r"-----[^-]+-----|\s+", "", raw_key)
-        formatted_body = "\n".join([body[i:i+64] for i in range(0, len(body), 64)])
-        creds_dict["private_key"] = f"-----BEGIN PRIVATE KEY-----\n{formatted_body}\n-----END PRIVATE KEY-----\n"
-        
-        credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+
+        # Streamlit Secretsで \n が文字列化されている場合だけ実改行へ戻す
+        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+
+        credentials = Credentials.from_service_account_info(
+            creds_dict,
+            scopes=scopes
+        )
+
         gc = gspread.authorize(credentials)
-        
-        # スプレッドシートを開く
-        sheet = gc.open_by_key("1ZH1Wfg438uequ9o95MfxwFmJ5Ro7_glFO9t-UlgKq2w").sheet1
-        
-        # 1行追加
+
+        sheet = gc.open_by_key(
+            "1ZH1Wfg438uequ9o95MfxwFmJ5Ro7_glFO9t-UlgKq2w"
+        ).sheet1
+
         row_values = list(log_entry.values())
         sheet.append_row(row_values)
+
         return True
+
     except Exception as e:
         st.error(f"スプレッドシート保存エラー: {e}")
         return False
