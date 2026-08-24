@@ -1,9 +1,8 @@
 import json
 import time
+import requests
 import pandas as pd
 import streamlit as st
-import gspread
-from google.oauth2.service_account import Credentials
 
 st.set_page_config(page_title="思考の検品力テスト", page_icon="🧪", layout="wide")
 st.title("🧪 批判的思考（思考の検品力）測定シミュレーター")
