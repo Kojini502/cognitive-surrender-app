@@ -1,5 +1,6 @@
-import time
+import base64
 import json
+import time
 import pandas as pd
 import streamlit as st
 import gspread
@@ -61,9 +62,11 @@ def save_to_gsheets(log_entry):
             "https://www.googleapis.com/auth/drive"
         ]
         
-        # StreamlitがTOMLセクションを自動で辞書化
-        creds_dict = dict(st.secrets["gcp_service_account"])
-        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+        # Base64から完全に元のJSONを安全復元
+        b64_str = st.secrets["gcp_service_account_b64"]
+        json_str = base64.b64decode(b64_str).decode("utf-8")
+        creds_dict = json.loads(json_str)
+        
         credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         gc = gspread.authorize(credentials)
         
