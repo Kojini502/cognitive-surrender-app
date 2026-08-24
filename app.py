@@ -67,6 +67,9 @@ def save_to_gsheets(log_entry):
         
         # Secretsから安全に認証情報を読み出し
         creds_dict = dict(st.secrets["gcp_service_account"])
+        # \n が文字としてエスケープされている場合の自動修正（ここを追加！）
+        creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+        
         credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         gc = gspread.authorize(credentials)
         
@@ -80,7 +83,6 @@ def save_to_gsheets(log_entry):
     except Exception as e:
         st.error(f"スプレッドシート保存エラー: {e}")
         return False
-
 if "logs" not in st.session_state:
     st.session_state.logs = []
 
