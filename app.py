@@ -1,5 +1,3 @@
-import base64
-import json
 import time
 import pandas as pd
 import streamlit as st
@@ -62,14 +60,9 @@ def save_to_gsheets(log_entry):
             "https://www.googleapis.com/auth/drive"
         ]
         
-        # Base64文字列を取得し、パディングを安全に自動補正
-        b64_str = st.secrets["gcp_service_account_b64"].strip()
-        missing_padding = len(b64_str) % 4
-        if missing_padding:
-            b64_str += '=' * (4 - missing_padding)
-            
-        json_str = base64.b64decode(b64_str).decode("utf-8")
-        creds_dict = json.loads(json_str)
+        # Secretsから辞書を直接取得し、改行コードを安全に整形
+        creds_dict = dict(st.secrets["gcp_service_account"])
+        creds_dict["private_key"] = creds_dict["private_key"].encode().decode("unicode_escape")
         
         credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         gc = gspread.authorize(credentials)
@@ -84,9 +77,7 @@ def save_to_gsheets(log_entry):
     except Exception as e:
         st.error(f"スプレッドシート保存エラー: {e}")
         return False
-    except Exception as e:
-        st.error(f"スプレッドシート保存エラー: {e}")
-        return False
+    
 if "logs" not in st.session_state:
     st.session_state.logs = []
 
