@@ -60,10 +60,8 @@ def save_to_gsheets(log_entry):
             "https://www.googleapis.com/auth/drive"
         ]
         
-        # Secretsから辞書を直接取得し、改行コードを安全に整形
+        # 3重クォートで保持された辞書をそのまま認証に渡す
         creds_dict = dict(st.secrets["gcp_service_account"])
-        creds_dict["private_key"] = creds_dict["private_key"].encode().decode("unicode_escape")
-        
         credentials = Credentials.from_service_account_info(creds_dict, scopes=scopes)
         gc = gspread.authorize(credentials)
         
